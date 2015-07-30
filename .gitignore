@@ -1,0 +1,9 @@
+*.class
+.project
+.settings
+.classpath
+*.zip
+*.jar
+*.so
+*.dll
+res/*
