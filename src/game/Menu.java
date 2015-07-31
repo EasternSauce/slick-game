@@ -1,4 +1,4 @@
-package javagame;
+package game;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -9,7 +9,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 public class Menu extends BasicGameState{
-	boolean goToPlay;
+	private boolean goToPlay;
 	private Input input;
 	
 	public Menu(int state){}

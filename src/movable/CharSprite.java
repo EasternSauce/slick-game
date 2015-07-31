@@ -1,22 +1,18 @@
-package javagame;
+package movable;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 
+import game.Game;
+import utility.Loader;
+
 public class CharSprite{
-	private Image sheet;
-	private int x;
-	private int y;
 	private Animation walkLeftAnim;
 	private Animation walkRightAnim;
 	private Animation walkUpAnim;
 	private Animation walkDownAnim;
 	
 	public CharSprite(Image sheet, int x, int y){
-		this.sheet = sheet;
-		this.x = x;
-		this.y = y;
-
 		Image[] walkLeft = new Image[Game.CHAR_SPRITE_SHEET_W];
 		Image[] walkRight = new Image[Game.CHAR_SPRITE_SHEET_W];
 		Image[] walkUp = new Image[Game.CHAR_SPRITE_SHEET_W];
@@ -51,10 +47,4 @@ public class CharSprite{
 	public Animation getWalkDownAnim(){
 		return walkDownAnim;
 	}
-	
-	public CharSprite copy(){
-		return new CharSprite(sheet, x, y);
-	}
-	
-	
 }

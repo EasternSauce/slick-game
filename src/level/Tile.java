@@ -1,7 +1,9 @@
-package javagame;
+package level;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+
+import game.Game;
 
 public class Tile{
 	private Image image;

@@ -1,29 +1,35 @@
-package javagame;
+package movable;
 
 import java.util.ArrayList;
 
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.geom.Rectangle;
+
+import game.Game;
+import level.Level;
+import utility.Direction;
 
 public abstract class Movable{
 	protected float x;
 	protected float y;
 	protected Direction dir;
-	protected Rect boundBox;
+	protected Rectangle boundBox;
 	
-	public Movable(float x, float y, Rect boundBox){
+	public Movable(float x, float y, Rectangle boundBox){
 		this.x = x;
 		this.y = y;
-		this.boundBox = boundBox;
 		this.dir = Direction.DOWN;
+		this.boundBox = boundBox;
 	}
 	
-	public abstract boolean collisionCheck(ArrayList<Rect> solidObjects, ArrayList<Character> characters, float newX, float newY);
+	public abstract boolean collisionCheck(ArrayList<Rectangle> solidObjects,
+			ArrayList<Character> characters, float newX, float newY);
 	
 	public boolean goLeft(Level level, ArrayList<Character> characters, float delta){
 		boolean able = false;
 		float newX = x - delta;
 		float newY = y;
-		if(newX + boundBox.x >=0){
+		if(newX + boundBox.getX() >=0){
 			if(collisionCheck(level.getSolidObjects(), characters, newX, newY)){
 				able = true;
 				x = newX;
@@ -37,7 +43,7 @@ public abstract class Movable{
 		boolean able = false;
 		float newX = x + delta;
 		float newY = y;
-		if(newX + boundBox.x + boundBox.w < level.getWidth() * Game.TILE_SIZE){
+		if(newX + boundBox.getX() + boundBox.getWidth() < level.getWidth() * Game.TILE_SIZE){
 			if(collisionCheck(level.getSolidObjects(), characters, newX, newY)){
 				able = true;
 				x = newX;
@@ -51,8 +57,8 @@ public abstract class Movable{
 		boolean able = false;
 		float newX = x;
 		float newY = y - delta;
-		if(newY + boundBox.y >=0){
-			if(this.collisionCheck(level.getSolidObjects(), characters, newX, newY)){
+		if(newY + boundBox.getY() >=0){
+			if(collisionCheck(level.getSolidObjects(), characters, newX, newY)){
 				able = true;
 				x = newX;
 				y = newY;
@@ -65,7 +71,7 @@ public abstract class Movable{
 		boolean able = false;
 		float newX = x;
 		float newY = y + delta;
-		if(newY + boundBox.y + boundBox.h < level.getHeight() * Game.TILE_SIZE){
+		if(newY + boundBox.getY() + boundBox.getHeight() < level.getHeight() * Game.TILE_SIZE){
 			if(collisionCheck(level.getSolidObjects(), characters, newX, newY)){
 				able = true;
 				x = newX;

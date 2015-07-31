@@ -1,4 +1,4 @@
-package javagame;
+package movable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -6,56 +6,61 @@ import java.util.Iterator;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
+
+import game.Game;
+import game.Play;
+import level.Level;
+import level.Sprite;
+import utility.Direction;
 
 public class Character extends Movable{
-	private Direction facing = Direction.DOWN;
-	private boolean walking = false;
-	private Image bulletImage;
-	private Rect bulletBoundBox;
-	private long lastShotTime = 0;
+	private Direction facing;
+	private boolean walking;
+	private long lastShotTime;
 	private Animation currentAnim;
 	private CharSprite sprite;
 	private CharControls controls;
 	private int health;
 	private int maxHealth;
-	private boolean dead = false;
-	private long timeOfDeath = 0;
+	private boolean dead;
+	private long timeOfDeath;
 	private int startX;
 	private int startY;
+	private Sprite bulletSprite;
 	
-	public Character(int x, int y, Rect boundBox, CharSprite sprite, Image bulletImage,
-			Rect bulletBoundBox, CharControls controls) throws SlickException{
+	public Character(int x, int y, Rectangle boundBox, CharSprite sprite, Sprite bulletSprite, CharControls controls) throws SlickException{
 		super(x, y, boundBox);
-		this.startX = x;
-		this.startY = y;
-		this.sprite = sprite;
-		
+		facing = Direction.DOWN;
+		walking = false;
+		lastShotTime = 0;
 		currentAnim = sprite.getWalkDownAnim();
-		currentAnim.stop();
-		
-		this.bulletImage = bulletImage;
-		this.bulletBoundBox = bulletBoundBox;
-		
+		this.sprite = sprite;
 		this.controls = controls;
+		health = 100;
+		maxHealth = 100;
+		dead = false;
+		timeOfDeath = 0;
+		startX = x;
+		startY = y;
+		this.bulletSprite = bulletSprite;
 		
-		this.health = 100;
-		this.maxHealth = 100;
+		currentAnim.stop();
 	}
 	
 	@Override
 	public void draw(Graphics g, float cameraX, float cameraY){
-		if(!this.dead){
+		if(!dead){
 			g.drawAnimation(currentAnim, x - cameraX, y - cameraY);
 			g.setColor(Color.green);
-			g.fillRect(x + 16 - cameraX, y - cameraY, (float)(Game.TILE_SIZE / 2) * (float)health / (float)maxHealth, 3);
+			g.fillRect(x + Game.TILE_SIZE / 4 - cameraX, y - cameraY, (float)(Game.TILE_SIZE / 2) * (float)health / (float)maxHealth, 3);
 		}
 	}
 
 	public void update(Input input, int d, Level level, ArrayList<Character> characters, ArrayList<Projectile> bullets, long runningTime){
-		if(!this.dead){
+		if(!dead){
 			float delta = Game.CHAR_SPEED * (float)d;
 			boolean newWalking = false;
 			Direction newFacing = facing;
@@ -64,57 +69,57 @@ public class Character extends Movable{
 				newFacing = Direction.LEFT;
 				currentAnim = sprite.getWalkLeftAnim();
 				newWalking = true;	
-				this.goLeft(level, characters, delta);
+				goLeft(level, characters, delta);
 			}
 			if(input.isKeyDown(controls.getGoRight())){
 				newFacing = Direction.RIGHT;
 				currentAnim = sprite.getWalkRightAnim();
 				newWalking = true;
-				this.goRight(level, characters, delta);
+				goRight(level, characters, delta);
 			}
 			if(input.isKeyDown(controls.getGoUp())){
 				newFacing = Direction.UP;
 				currentAnim = sprite.getWalkUpAnim();
 				newWalking = true;
-				this.goUp(level, characters, delta);
+				goUp(level, characters, delta);
 			}
 			if(input.isKeyDown(controls.getGoDown())){	
 				newFacing = Direction.DOWN;
 				currentAnim = sprite.getWalkDownAnim();
 				newWalking = true;
-				this.goDown(level, characters, delta);
+				goDown(level, characters, delta);
 			}
 			if(input.isKeyDown(controls.getShoot())){
 				shoot(bullets);
 			}
 			
-			if(this.walking && !newWalking){ //if stops walking
+			if(walking && !newWalking){ //if stops walking
 				currentAnim.restart();
 				currentAnim.stop();
 			}	
-			else if(!this.walking && newWalking){ //if starts walking
+			else if(!walking && newWalking){ //if starts walking
 				currentAnim.restart();
 				currentAnim.start();
 			}
-			if(newWalking && this.facing != newFacing){ //start anim if changes direction mid-walk
+			if(newWalking && facing != newFacing){ //start anim if changes direction mid-walk
 				currentAnim.restart();
 				currentAnim.start();
 			}
 			
-			this.walking = newWalking;
-			this.facing = newFacing;
+			walking = newWalking;
+			facing = newFacing;
 			
-			if(this.health == 0){
-				this.dead = true;
-				this.timeOfDeath = runningTime;
+			if(health == 0){
+				dead = true;
+				timeOfDeath = runningTime;
 			}
 		}
 		else{
-			if(runningTime > this.timeOfDeath + Game.DEATH_TIMER){
-				this.dead = false;
-				this.health = 100;
-				this.x = this.startX;
-				this.y = this.startY;
+			if(runningTime > timeOfDeath + Game.DEATH_TIMER){
+				dead = false;
+				health = 100;
+				x = startX;
+				y = startY;
 			}
 		}
 	}
@@ -124,7 +129,7 @@ public class Character extends Movable{
 		final int shootDelay = 500;
 		if(currentTime > lastShotTime + shootDelay){
 			lastShotTime = currentTime;
-			Projectile bullet = new Projectile(x, y, bulletBoundBox, bulletImage, 10, facing, this);
+			Projectile bullet = new Projectile(x, y, bulletSprite, 10, facing, this);
 			bullets.add(bullet);
 		}
 	}
@@ -138,29 +143,33 @@ public class Character extends Movable{
 	}
 	
 	public void onBeingShot(Character shooter){
-		//System.out.println(this.toString() + ": " + shooter.toString() + " shot at me!");
-		this.health -= 10;
-		if(this.health <= 0) this.health = 0;
-		//System.out.println("I have " + this.health + " hp left");
+		health -= 10;
+		if(health <= 0) health = 0;
 	}
 	
-	public boolean collisionCheck(ArrayList<Rect> solidObjects, ArrayList<Character> characters, float newX, float newY){
-		Rect movableRect = new Rect((int)(newX + boundBox.x), (int)(newY + boundBox.y), boundBox.w, boundBox.h);
+	public boolean collisionCheck(ArrayList<Rectangle> solidObjects,
+			ArrayList<Character> characters, float newX, float newY){
+		Rectangle movableRect = new Rectangle((int)(newX + boundBox.getX()),
+				(int)(newY + boundBox.getY()), boundBox.getWidth(), boundBox.getHeight());
 		for(int i = 0; i < solidObjects.size(); i++){
-			Rect rect = solidObjects.get(i);
-			if(Rect.areColliding(rect, movableRect)) return false;
+			Rectangle rect = solidObjects.get(i);
+			if(rect.intersects(movableRect)) return false;
 		}
 		
 		for(Iterator<Character> it = characters.iterator(); it.hasNext();){
 			Character character = it.next();
-			if(character == this) continue;
+			if(character == this || character.isDead()) continue;
 			if(character.isColliding(movableRect)) return false;
 		}
 		return true;
 	}
 	
-	public boolean isColliding(Rect rect){
-		return Rect.areColliding(rect, new Rect((int)(x + boundBox.x),
-				(int)(y + boundBox.y), boundBox.w, boundBox.h));
+	public boolean isDead(){
+		return dead;
+	}
+
+	public boolean isColliding(Rectangle rect){
+		return rect.intersects(new Rectangle((int)(x + boundBox.getX()),
+				(int)(y + boundBox.getY()), boundBox.getWidth(), boundBox.getHeight()));
 	}
 }

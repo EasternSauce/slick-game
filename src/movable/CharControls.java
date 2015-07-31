@@ -1,4 +1,4 @@
-package javagame;
+package movable;
 
 public class CharControls{
 	private int goLeft;
