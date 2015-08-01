@@ -12,7 +12,7 @@ import level.Sprite;
 import utility.Direction;
 
 public class Projectile extends Movable{
-	//private int damage;
+	private int damage;
 	private Sprite sprite;
 	private boolean isOut;
 	private Character shooter;
@@ -21,7 +21,7 @@ public class Projectile extends Movable{
 		super(x, y, sprite.getBoundBox());
 		this.dir = dir;
 		
-		//this.damage = damage;
+		this.damage = damage;
 		this.sprite = sprite;
 		isOut = false;
 		this.shooter = shooter;
@@ -63,10 +63,14 @@ public class Projectile extends Movable{
 			Character character = it.next();
 			if(character == shooter || character.isDead()) continue;
 			if(character.isColliding(movableRect)){
-				character.onBeingShot(shooter);
+				character.onBeingShot(shooter, this);
 				return false;
 			}
 		}
 		return true;
+	}
+
+	public int getDamage(){
+		return damage;
 	}
 }

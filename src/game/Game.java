@@ -22,6 +22,9 @@ public class Game extends StateBasedGame{
 	public static final String WINDOW_TITLE = "HEHEHEHE";
 	public static final String LEVEL_PATH = "res/level0.txt";
 	public static final String MUSIC_PATH = "res/music.wav";
+	public static final String LEVEL_PROPS_PATH = "res/level0_props.txt";
+	public static final int BULLET_DAMAGE = 20;
+	public static final String SPRITES_PATH = "res/sprites.txt";
 	
 	public Game(String title){
 		super(title);

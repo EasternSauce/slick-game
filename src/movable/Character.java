@@ -129,7 +129,7 @@ public class Character extends Movable{
 		final int shootDelay = 500;
 		if(currentTime > lastShotTime + shootDelay){
 			lastShotTime = currentTime;
-			Projectile bullet = new Projectile(x, y, bulletSprite, 10, facing, this);
+			Projectile bullet = new Projectile(x, y, bulletSprite, Game.BULLET_DAMAGE, facing, this);
 			bullets.add(bullet);
 		}
 	}
@@ -142,8 +142,8 @@ public class Character extends Movable{
 		return y - (Game.HEIGHT - Game.TILE_SIZE)/2;
 	}
 	
-	public void onBeingShot(Character shooter){
-		health -= 10;
+	public void onBeingShot(Character shooter, Projectile bullet){
+		health -= bullet.getDamage();
 		if(health <= 0) health = 0;
 	}
 	

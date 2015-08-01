@@ -17,7 +17,6 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import level.Level;
-import level.Prop;
 import level.Sprite;
 import movable.CharControls;
 import movable.CharSprite;
@@ -40,29 +39,29 @@ public class Play extends BasicGameState{
 	public Play(int state){
 		runningTime = 0;
 	}
-
+	
 	@Override
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException{
 		input = new Input(Game.HEIGHT);
 		goToMenu = false;
-		sprites = new HashMap<String, Sprite>();
+		
 		bullets = new ArrayList<Projectile>();
 		characters = new ArrayList<Character>();
 		
-		this.setInput(input);
+		setInput(input);
 		input.disableKeyRepeat();
 		input.addListener(this);
 		
 		sheet = new Image(Game.SHEET_PATH);
 		sheet.setFilter(Image.FILTER_NEAREST);
 		
-		sprites.put("grass", new Sprite(Loader.loadImage(sheet, 0, 4), new Rectangle(0,0,0,0)));
-		sprites.put("tree", new Sprite(Loader.loadImage(sheet, 1, 4), new Rectangle(17,9,26,38)));
-		sprites.put("coin", new Sprite(Loader.loadImage(sheet, 2, 4), new Rectangle(1,1,1,1)));
-		sprites.put("door", new Sprite(Loader.loadImage(sheet, 3, 4), new Rectangle(1,1,1,1)));
-		sprites.put("bullet", new Sprite(Loader.loadImage(sheet, 4, 4), new Rectangle(30, 30, 4, 4)));
-
+		try {
+			sprites = Loader.loadSprites(Game.SPRITES_PATH, sheet);
+		} catch(IOException e1){
+			e1.printStackTrace();
+		}
+		
 		Rectangle charBoundBox = new Rectangle(26, 6, 13, 53);
 		
 		CharControls heroControls = new CharControls(Input.KEY_A, Input.KEY_D,
@@ -77,17 +76,16 @@ public class Play extends BasicGameState{
 		
 		String[][] areaMap = null;
 		try {
-			areaMap = Loader.loadAreaMap(Game.LEVEL_PATH);
+			areaMap = Loader.loadTerrainMap(Game.LEVEL_PATH);
 		} catch(IOException e){
 			e.printStackTrace();
 		}
 		
-		ArrayList<Prop> props = new ArrayList<Prop>();
-		props.add(new Prop(sprites.get("tree"), 45, 45));
-		props.add(new Prop(sprites.get("tree"), 100, 45));
-		props.add(new Prop(sprites.get("tree"), 45, 100));
-		
-		firstArea = new Level(areaMap, sprites, props);
+		try {
+			firstArea = new Level(areaMap, sprites, Loader.loadProps(Game.LEVEL_PROPS_PATH, sprites));
+		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
+		}
 		
 		//load and start music
 		music = new Music(Game.MUSIC_PATH);
